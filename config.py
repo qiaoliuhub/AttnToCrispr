@@ -81,7 +81,8 @@ seq2vec_features = ["sequence"]
 
 # outlayer extra features
 extra_numerical_features = [] #+ ["r_d_tm" ] + ['aa_cut'] #+ ['essentiality'] #+ ['log_CN']# + ["centrality"]# + ['aa_cut'] #+ ["aa_cut", "r_d_tm", "log_count","log_CN"] + ["centrality"]
-extra_categorical_features = []#, ['epi_' + str(i) for i in range(4)] #+ ["dnase_sensitivity"] # + ['edge']
+extra_categorical_features = [] #, ['epi_' + str(i) for i in range(4)] #+ ["dnase_sensitivity"] # + ['edge']
+
 # if with_pam:
 #     extra_categorical_features = ["PAM"] + extra_categorical_features
 off_target = False

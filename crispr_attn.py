@@ -4,13 +4,9 @@ import logging
 import os
 import importlib
 import sys
-import pickle
 import numpy as np
 import pandas as pd
-import utils
-import process_features
 import attention_model
-import attention_setting
 import torch
 from torch.utils import data
 import torch_visual
@@ -19,7 +15,6 @@ from time import time
 import random
 import my_data
 from torch import cuda, device
-import shap
 import torch.nn.functional as F
 from sklearn.metrics import mean_squared_error
 from scipy.stats import pearsonr, spearmanr
@@ -175,7 +170,7 @@ def run():
         crispr_model.to(device2)
         logger.debug("I might need to freeze some of the weights")
 
-    logger.debug("Built the RNN model successfully")
+    logger.debug("Built the Crispr model successfully")
 
     optimizer = torch.optim.Adam(crispr_model.parameters(), lr=config.start_lr, weight_decay=config.lr_decay,
                                  betas=(0.9, 0.98), eps=1e-9)

@@ -42,13 +42,9 @@ This model includes four components:
 
 change the model directory in config.py when old model need to be loaded for testing
 ```
-loaded_model_path = os.path.join(cur_dir, "dataset/best_model/<cellline>_lstm_model.h5")
+loaded_model_path = os.path.join(cur_dir, "dataset/best_model/<cellline>_attn_model.h5")
 ```
 
-## Specify which dataset to use
-```
-
-```
 ## Run the program and get prediction result
 
 Make sure the data is in dataset/\<cellline\>/ folder and execute
