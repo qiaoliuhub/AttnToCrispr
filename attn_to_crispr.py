@@ -133,4 +133,3 @@ if __name__ == "__main__":
         shutil.rmtree(config.run_dir)
         logger.debug("clean directory %s" % config.run_dir)
         raise
->>>>>>> c3caa68291cb276499380f5e50fe72db4d26fd71
