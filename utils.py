@@ -9,16 +9,11 @@ import importlib
 config_path = ".".join(sys.argv[1].split("/")[-3:]) + "." \
     if len(sys.argv) >= 2 and sys.argv[1].split("/")[-1].startswith("run") else ""
 config = importlib.import_module(config_path+"config")
-raw_map = pd.read_csv(config.mismatch_matrix, header=None)
-pam_map = pd.read_csv(config.pam_matrix)
 pam_mapping = {}
 
 
 def get_map(row):
     pam_mapping[row[0]] = row[1]
-
-
-pam_map.apply(lambda row: get_map(row), axis=1)
 
 
 class __NtsTokenizer(Tokenizer):
