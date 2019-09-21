@@ -115,3 +115,20 @@ def run():
 
     logger.debug("Testing mse is {0}, Testing pearson correlation is {1!r} and Testing "
                  "spearman correlation is {2!r}".format(np.mean(test_loss), test_pearson, test_spearman))
+
+
+if __name__ == "__main__":
+
+    np.random.seed(3)
+
+    try:
+        run()
+        logger.debug("new directory %s" % config.run_dir)
+
+    except:
+
+        import shutil
+
+        shutil.rmtree(config.run_dir)
+        logger.debug("clean directory %s" % config.run_dir)
+        raise
