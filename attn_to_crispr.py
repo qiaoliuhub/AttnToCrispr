@@ -35,7 +35,6 @@ torch.set_default_tensor_type('torch.FloatTensor')
 
 # Setting the correct config file
 config_path = ".".join(["models", sys.argv[1]]) + "." if len(sys.argv) >= 2 else ""
-print(config_path)
 config = importlib.import_module(config_path + "config")
 
 # Setting up log file

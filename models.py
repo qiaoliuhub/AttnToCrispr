@@ -10,7 +10,7 @@ import sys
 import importlib
 from keras.constraints import unitnorm
 
-config_path = ".".join(sys.argv[1].split("/")[-3:]) + "." if len(sys.argv) >= 2 and sys.argv[1].split("/")[-1].startswith("run") else ""
+config_path = ".".join(["models", sys.argv[1]]) + "." if len(sys.argv) >= 2 else ""
 config = importlib.import_module(config_path+"config")
 
 
