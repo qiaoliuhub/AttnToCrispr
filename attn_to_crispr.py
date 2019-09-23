@@ -59,7 +59,7 @@ def run():
     partition = {'test': list(X.index)}
     labels = {key: value for key, value in zip(range(len(y)),
                                                list(y.values.reshape(-1)))}
-    test_params = {'batch_size': len(config.batch_size),
+    test_params = {'batch_size': config.batch_size,
                    'shuffle': False}
     logger.debug("Preparing datasets ... ")
     test_set = my_data.MyDataset(partition['test'], labels)
