@@ -74,13 +74,13 @@ word2vec_weight_matrix = False
 # MIN_MAX scale festure
 centrality_features = ["Degree","Closeness", "Betweennes", "NetworkConstraint",
                        "ClusteringCoefficient", "PageRank"]
-scale_feature = []  #+ ["r_d_tm" ] + ['aa_cut'] + ['essentiality'] + ['log_CN']#+ ["centrality"] #+ ['aa_cut'] #["log_count", "r_d_tm", "log_CN"] + ["centrality"]
+scale_feature = []  #+ ["r_d_tm" ] + ['aa_cut'] + ['NetExpress'] + ['log_CN']#+ ["centrality"] #+ ['aa_cut'] #["log_count", "r_d_tm", "log_CN"] + ["centrality"]
 
 # RNN input features, every unit input is 200 elements vector
 seq2vec_features = ["sequence"]
 
 # outlayer extra features
-extra_numerical_features = [] + ['essentiality'] + ['log_CN'] #+ ["r_d_tm" ] + ['aa_cut'] + ['essentiality'] + ['log_CN']# + ["centrality"]# + ['aa_cut'] #+ ["aa_cut", "r_d_tm", "log_count","log_CN"] + ["centrality"] 
+extra_numerical_features = [] + ['NetExpress'] + ['log_CN']
 extra_categorical_features = []  #+ ["DNase"] + ["CTCF", "RRBS", "H3K4me3"] # + ['edge']
 # if with_pam:
 #     extra_categorical_features = ["PAM"] + extra_categorical_features
