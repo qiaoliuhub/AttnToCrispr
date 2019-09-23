@@ -70,6 +70,7 @@ def run():
     crispr_model = load(config.retraining_model)
     crispr_model.load_state_dict(load(config.retraining_model_state))
     crispr_model.to(device2)
+    logger.debug("loaded a trained model")
 
     ### Testing
     test_i = 0
@@ -133,4 +134,3 @@ if __name__ == "__main__":
         shutil.rmtree(config.run_dir)
         logger.debug("clean directory %s" % config.run_dir)
         raise
->>>>>>> c3caa68291cb276499380f5e50fe72db4d26fd71
