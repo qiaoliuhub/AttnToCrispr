@@ -5,21 +5,14 @@ import importlib
 import sys
 import numpy as np
 import pandas as pd
-import attention_model
 import torch
 from torch.utils import data
-import torch_visual
 from torch import save, load
-from time import time
-import random
 import my_data
 from torch import cuda, device
-import torch.nn.functional as F
 from sklearn.metrics import mean_squared_error
 from scipy.stats import pearsonr, spearmanr
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
 import OT_crispr_attn
-import feature_imp
 
 # setting nvidia gpu environment
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"

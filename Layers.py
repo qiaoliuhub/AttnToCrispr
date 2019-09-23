@@ -1,7 +1,11 @@
 import torch.nn.functional as F
 import torch.nn as nn
 from Sublayers import FeedForward, MultiHeadAttention, Norm
-import attention_setting
+import sys
+import importlib
+
+config_path = ".".join(["models", sys.argv[1]]) + "." if len(sys.argv) >= 2 else ""
+attention_setting = importlib.import_module(config_path+"attention_setting")
 
 class EncoderLayer(nn.Module):
     def __init__(self, d_input, d_model, heads, dropout=0.1):
