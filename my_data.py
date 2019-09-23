@@ -1,8 +1,13 @@
 import torch
 from torch.utils import data
 import crispr_attn
-import attention_setting
 import os
+import sys
+import importlib
+
+config_path = ".".join(["models", sys.argv[1]]) + "." if len(sys.argv) >= 2 else ""
+attention_setting = importlib.import_module(config_path+"attention_setting")
+
 
 class MyDataset(data.Dataset):
 

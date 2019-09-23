@@ -16,6 +16,7 @@ import importlib
 # Setting the correct config file
 config_path = ".".join(["models", sys.argv[1]]) + "." if len(sys.argv) >= 2 else ""
 config = importlib.import_module(config_path + "config")
+attention_setting = importlib.import_module(config_path+"attention_setting")
 
 
 def get_clones(module, N):
