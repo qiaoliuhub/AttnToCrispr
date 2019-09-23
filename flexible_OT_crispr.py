@@ -10,7 +10,6 @@ import pandas as pd
 import utils
 import process_features
 import attention_model
-import attention_setting
 import torch
 from torch.utils import data
 import torch_visual
@@ -44,6 +43,7 @@ torch.set_default_tensor_type('torch.FloatTensor')
 # Setting the correct config file
 config_path = ".".join(["models", sys.argv[1]]) + "." if len(sys.argv) >= 2 else ""
 config = importlib.import_module(config_path + "config")
+attention_setting = importlib.import_module(config_path+"attention_setting")
 
 # Setting up log file
 formatter = logging.Formatter(fmt='%(asctime)s %(levelname)s %(name)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S')
