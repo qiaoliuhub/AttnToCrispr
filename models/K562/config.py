@@ -150,9 +150,9 @@ if retraining:
 #
 # else use the existed config file
 run_specific_config = os.path.join(run_dir, "config.py")
-cur_dir_config = os.path.join(cur_dir, "config.py")
+cur_dir_config = os.path.join(retraining_model_path, "config.py")
 run_specific_attention_setting = os.path.join(run_dir, "attention_setting.py")
-cur_dir_attention_setting = os.path.join(cur_dir, "attention_setting.py")
+cur_dir_attention_setting = os.path.join(retraining_model_path, "attention_setting.py")
 
 # save run specific data
 retransform = False

@@ -17,7 +17,7 @@ data_specific = "_CN_centrality" if cellline != "test" else ""
 update_features = False
 
 # sequence length
-seq_start = 2
+seq_start = 0
 sep_len = 0
 seq_len = 20
 
