@@ -1,5 +1,10 @@
-import config
 import os
+import importlib
+import sys
+
+# Setting the correct config file
+config_path = ".".join(["models", sys.argv[1]]) + "." if len(sys.argv) >= 2 else ""
+config = importlib.import_module(config_path + "config")
 
 output_FF_layers = [4000, 100, 1] #[4000, 1000, 100, 1] #[200, 200, 100, 100, 1]
 cur_work_dir = os.getcwd()
