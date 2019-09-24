@@ -14,7 +14,7 @@ else:
 
 # data speficic name, for example, if file name is K562_CN, then data_specific is _CN
 data_specific = "_data" if cellline != "test" else ""
-update_features = False
+update_features = True
 
 # sequence length
 seq_start = 0
@@ -108,7 +108,7 @@ old_model_hdf5_path = os.path.join(cur_dir, "dataset")
 old_model_hdf5 = os.path.join(old_model_hdf5_path, "lstm_model.h5")
 
 # parameters when retraining
-retraining = False
+retraining = True
 fine_tune_trainable = True
 retraining_datasize = 3.0/3 if retraining else 1
 frozen_embedding_only = True
