@@ -317,10 +317,11 @@ def run():
         logger.debug("loading some intermediate step's model")
         logger.debug("Load in model successfully")
 
-    # logger.debug("Persisting model")
-    # # serialize weights to HDF5
-    # crispr_model.save(config.hdf5_path)
-    # logger.debug("Saved model to disk")
+    logger.debug("Persisting model")
+    # serialize weights to HDF5
+    save(best_crispr_model, config.hdf5_path)
+    save(best_crispr_model.state_dict(), config.hdf5_path_state)
+    logger.debug("Saved model to disk")
 
     #best_index = np.argmax(cv_roc_auc_scores)
     #best_drug_model = cv_models[int(best_index)]
