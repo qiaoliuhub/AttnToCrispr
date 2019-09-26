@@ -47,6 +47,60 @@ logger = logging.getLogger("Recurrent neural network")
 logger.addHandler(fh)
 logger.setLevel(logging.DEBUG)
 
+def test_model(best_crispr_model, test_generator, save_output, std_scaler = None):
+
+    ### Testing
+    test_i = 0
+    test_total_loss = 0
+    test_loss = []
+    test_pearson = 0
+    test_preds = []
+    test_ys = []
+
+    with torch.set_grad_enabled(False):
+
+        best_crispr_model.eval()
+        for local_batch, local_labels in test_generator:
+            # Transfer to GPU
+            test_i += 1
+            local_labels_on_cpu = np.array(local_labels).reshape(-1)
+            sample_size = local_labels_on_cpu.shape[-1]
+            local_labels_on_cpu = local_labels_on_cpu[:sample_size]
+            local_batch, local_labels = local_batch.float().to(device2), local_labels.float().to(device2)
+            # seq_local_batch = local_batch.narrow(dim=1, start=0, length=for_input_len).long()
+            # extra_local_batch = local_batch.narrow(dim=1, start=for_input_len, length=extra_input_len)
+            # Model computations
+            preds = best_crispr_model(local_batch).contiguous().view(-1)
+            assert preds.size(-1) == local_labels.size(-1)
+            prediction_on_cpu = preds.cpu().numpy().reshape(-1)
+            mean_prediction_on_cpu = prediction_on_cpu[:sample_size]
+            if config.y_inverse_transform and std_scaler:
+                local_labels_on_cpu, mean_prediction_on_cpu = \
+                    std_scaler.inverse_transform(local_labels_on_cpu.reshape(-1, 1) / 100), \
+                    std_scaler.inverse_transform(prediction_on_cpu.reshape(-1, 1) / 100)
+            loss = mean_squared_error(local_labels_on_cpu, mean_prediction_on_cpu)
+            test_total_loss += loss
+            test_preds.append(mean_prediction_on_cpu)
+            test_ys.append(local_labels_on_cpu)
+
+            n_iter = 1
+            if (test_i) % n_iter == 0:
+                avg_loss = test_total_loss / n_iter
+                test_loss.append(avg_loss)
+                test_total_loss = 0
+
+        mean_prediction_on_cpu = np.concatenate(tuple(test_preds))
+        local_labels_on_cpu = np.concatenate(tuple(test_ys))
+        test_pearson = pearsonr(local_labels_on_cpu.reshape(-1), mean_prediction_on_cpu.reshape(-1))[0]
+        test_spearman = spearmanr(local_labels_on_cpu.reshape(-1), mean_prediction_on_cpu.reshape(-1))[0]
+        save_output.append(pd.DataFrame(local_labels_on_cpu, columns=['ground_truth']))
+        save_output.append(pd.DataFrame(mean_prediction_on_cpu, columns=['prediction']))
+        save_output = pd.concat(save_output, ignore_index=True, axis=1)
+        save_output.to_csv(config.test_prediction, index = False)
+
+        logger.debug("Testing mse is {0}, Testing pearson correlation is {1!r} and Testing "
+                     "spearman correlation is {2!r}".format(np.mean(test_loss), test_pearson, test_spearman))
+
 def run():
 
     data_pre = OT_crispr_attn.data_preparer()
@@ -358,63 +412,10 @@ def run():
     save(best_crispr_model.state_dict(), config.hdf5_path_state)
     logger.debug("Saved model to disk")
 
-    ### Testing
-    test_i = 0
-    test_total_loss = 0
-    test_loss = []
-    test_pearson = 0
-    test_preds = []
-    test_ys = []
-
-    with torch.set_grad_enabled(False):
-
-        best_crispr_model.eval()
-        for local_batch, local_labels in test_generator:
-            # Transfer to GPU
-            test_i += 1
-            local_labels_on_cpu = np.array(local_labels).reshape(-1)
-            sample_size = local_labels_on_cpu.shape[-1]
-            local_labels_on_cpu = local_labels_on_cpu[:sample_size]
-            local_batch, local_labels = local_batch.float().to(device2), local_labels.float().to(device2)
-            # seq_local_batch = local_batch.narrow(dim=1, start=0, length=for_input_len).long()
-            # extra_local_batch = local_batch.narrow(dim=1, start=for_input_len, length=extra_input_len)
-            # Model computations
-            preds = best_crispr_model(local_batch).contiguous().view(-1)
-            assert preds.size(-1) == local_labels.size(-1)
-            prediction_on_cpu = preds.cpu().numpy().reshape(-1)
-            mean_prediction_on_cpu = prediction_on_cpu[:sample_size]
-            if config.y_inverse_transform:
-                local_labels_on_cpu, mean_prediction_on_cpu = \
-                    std_scaler.inverse_transform(local_labels_on_cpu.reshape(-1, 1) / 100), \
-                    std_scaler.inverse_transform(prediction_on_cpu.reshape(-1, 1) / 100)
-            loss = mean_squared_error(local_labels_on_cpu, mean_prediction_on_cpu)
-            test_total_loss += loss
-            test_preds.append(mean_prediction_on_cpu)
-            test_ys.append(local_labels_on_cpu)
-
-            n_iter = 1
-            if (test_i) % n_iter == 0:
-                avg_loss = test_total_loss / n_iter
-                test_loss.append(avg_loss)
-                test_total_loss = 0
-
-        mean_prediction_on_cpu = np.concatenate(tuple(test_preds))
-        local_labels_on_cpu = np.concatenate(tuple(test_ys))
-        test_pearson = pearsonr(local_labels_on_cpu.reshape(-1), mean_prediction_on_cpu.reshape(-1))[0]
-        test_spearman = spearmanr(local_labels_on_cpu.reshape(-1), mean_prediction_on_cpu.reshape(-1))[0]
-        save_output = []
-        if 'essentiality' in config.extra_numerical_features:
-            save_output.append(data_pre.crispr.loc[test_index, 'essentiality'])
-        save_output.append(pd.DataFrame(local_labels_on_cpu, columns=['ground_truth']))
-        save_output.append(pd.DataFrame(mean_prediction_on_cpu, columns=['prediction']))
-        save_output = pd.concat(save_output, ignore_index=True, axis=1)
-        save_output.to_csv(config.test_prediction, index = False)
-
-
-
-
-    logger.debug("Testing mse is {0}, Testing pearson correlation is {1!r} and Testing "
-                 "spearman correlation is {2!r}".format(np.mean(test_loss), test_pearson, test_spearman))
+    save_output = []
+    if 'essentiality' in config.extra_numerical_features:
+        save_output.append(data_pre.crispr.loc[test_index, 'essentiality'])
+    test_model(best_crispr_model, test_generator, save_output, std_scaler)
 
 
     if config.check_feature_importance:
@@ -430,78 +431,6 @@ def run():
         feature_ranks_df = pd.DataFrame(feature_ranks)
         feature_ranks_df.to_csv(config.feature_importance_path, index = False)
         logger.debug("Get features ranks successfully")
-
-    # batch_input_importance = []
-    # batch_out_input_importance = []
-    # total_data, _ = next(iter(training_bg_generator))
-    # total_data = total_data.float().to(device2)
-    # seq_total_data = total_data.narrow(dim=1, start=0, length=for_input_len).long()
-    # extra_total_data = total_data.narrow(dim=1, start=for_input_len, length=extra_input_len)
-    # for local_batch, local_labels in test_generator:
-    #     # Transfer to GPU
-    #     local_batch = local_batch.float().to(device2)
-    #     seq_local_batch = local_batch.narrow(dim=1, start=0, length=for_input_len).long()
-    #     extra_local_batch = local_batch.narrow(dim=1, start=for_input_len, length=extra_input_len)
-    #     if config.save_feature_imp_model:
-    #         save(best_drug_model, config.hdf5_path)
-    #     # Model computations
-    #     e = shap.GradientExplainer(best_drug_model, data=list(total_data))
-    #     input_importance = e.shap_values(list(local_batch))
-    #     #pickle.dump(input_shap_values, open(setting.input_importance_path, 'wb+'))
-    #     batch_input_importance.append(input_importance)
-    #     logger.debug("Finished one batch of input importance analysis")
-    #
-    #     e1 = shap.GradientExplainer((best_drug_model, best_drug_model.out), data=list(total_data))
-    #     out_input_shap_value = e1.shap_values(list(local_batch))
-    #     batch_out_input_importance.append(out_input_shap_value)
-    #     logger.debug("Finished one batch of out input importance analysis")
-    #
-    #     if setting.save_inter_imp:
-    #         transform_input_importance = []
-    #         for layer in best_drug_model.dropouts:
-    #             cur_e = shap.GradientExplainer((best_drug_model, layer), data=list(total_data))
-    #             cur_transform_input_shap_value = cur_e.shap_values(list(local_batch))
-    #             transform_input_importance.append(cur_transform_input_shap_value)
-    #         transform_input_importance = np.concatenate(tuple(transform_input_importance), axis=1)
-    #
-    #         batch_transform_input_importance.append(transform_input_importance)
-    #     logger.debug("Finished one batch of importance analysis")
-    # batch_input_importance = np.concatenate(tuple(batch_input_importance), axis=0)
-    # batch_out_input_importance = np.concatenate(tuple(batch_out_input_importance), axis=0)
-    # pickle.dump(batch_input_importance, open(setting.input_importance_path, 'wb+'))
-    # pickle.dump(batch_out_input_importance, open(setting.out_input_importance_path, 'wb+'))
-    # if setting.save_inter_imp:
-    #     batch_transform_input_importance = np.concatenate(tuple(batch_transform_input_importance), axis=0)
-    #     pickle.dump(batch_transform_input_importance, open(setting.transform_input_importance_path, 'wb+'))
-    # logger.debug("Closing sessions")
-    # mse_visualizer.close()
-    # pearson_visualizer.close()
-    # spearman_visualizer.close()
-
-    #
-    # logger.debug("Saving test and prediction data plot")
-    # if last_performance > performance:
-    #     prediction = last_prediction
-    # utils.ytest_and_prediction_output(y_test[unique_test_index], prediction)
-    # logger.debug("Saved test and prediction data plot successfully")
-    #
-    # if config.check_feature_importance:
-    #     if performance > last_performance:
-    #         loaded_model = load_model(config.temp_hdf5_path,
-    #                                   custom_objects={'revised_mse_loss': utils.revised_mse_loss, 'tf': tf})
-    #         crispr_model = models.CrisprCasModel.compile_transfer_learning_model(loaded_model)
-    #     logger.debug("Getting features ranks")
-    #     names = []
-    #     names += ["for_" + str(i) for i in range(for_input.shape[1])]
-    #     names += ["rev_" + str(i) for i in range(rev_input.shape[1])]
-    #     names += ["off_" + str(i) for i in range(off_target_X_train.shape[1])]
-    #     names += config.extra_categorical_features + config.extra_numerical_features
-    #     ranker = feature_imp.InputPerturbationRank(names)
-    #     feature_ranks = ranker.rank(20, y_test[unique_test_index], crispr_model,
-    #                                 [data[unique_test_index] for data in test_list])
-    #     feature_ranks_df = pd.DataFrame(feature_ranks)
-    #     feature_ranks_df.to_csv(config.feature_importance_path, index=False)
-    #     logger.debug("Get features ranks successfully")
 
 if __name__ == "__main__":
 

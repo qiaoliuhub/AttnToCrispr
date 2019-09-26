@@ -81,6 +81,57 @@ def get_prediction_regular(model, test_index, unique_list, output_data, test_dat
 
     return performance, pd.Series(list(prediction))
 
+def test_model(best_crispr_model, test_generator, save_output):
+
+    #best_index = np.argmax(cv_roc_auc_scores)
+    #best_drug_model = cv_models[int(best_index)]
+    ### Testing
+    test_i = 0
+    test_total_loss = 0
+    test_loss = []
+    test_roc_auc = 0
+    test_pr_auc = 0
+    test_preds = []
+    test_ys = []
+
+    with torch.set_grad_enabled(False):
+
+        best_crispr_model.eval()
+        for local_batch, local_labels in test_generator:
+            # Transfer to GPU
+            test_i += 1
+            local_labels_on_cpu = np.array(local_labels).reshape(-1)
+            test_ys.append(local_labels_on_cpu)
+            n_pos = sum(local_labels_on_cpu)
+            n_neg = len(local_labels_on_cpu) - sum(local_labels_on_cpu)
+            logger.debug("{0!r} positive samples and {1!r} negative samples".format(n_pos, n_neg))
+            local_batch, local_labels = local_batch.float().to(device2), local_labels.long().to(device2)
+            # Model computations
+            preds = best_crispr_model(local_batch)
+            assert preds.size(0) == local_labels.size(0)
+            nllloss_test = F.nll_loss(preds, local_labels).item()
+            prediction_on_cpu = preds.cpu().numpy()[:, 1]
+            test_preds.append(prediction_on_cpu)
+            test_total_loss += nllloss_test
+
+            n_iter = 1
+            if (test_i + 1) % n_iter == 0:
+                avg_loss = test_total_loss / n_iter
+                test_loss.append(avg_loss)
+                test_total_loss = 0
+
+        preds = np.concatenate(tuple(test_preds))
+        ys = np.concatenate(tuple(test_ys))
+        logger.debug("{0!r} test data was tested".format(len(ys)))
+        test_roc_auc = roc_auc_score(ys, preds)
+        test_pr_auc = average_precision_score(ys, preds)
+        save_output.append(pd.DataFrame(ys, columns=['ground_truth']))
+        save_output.append(pd.DataFrame(preds, columns=['prediction']))
+        save_output = pd.concat(save_output, ignore_index=True, axis=1)
+        save_output.to_csv(config.test_prediction, index=False)
+        logger.debug("Testing NLLloss is {0}, Testing roc_auc is {1!r} and Testing "
+                     "pr_auc is {2!r}".format(np.mean(test_loss), test_roc_auc, test_pr_auc))
+
 def run():
 
     data_pre = OT_crispr_attn.data_preparer()
@@ -323,58 +374,10 @@ def run():
     save(best_crispr_model.state_dict(), config.hdf5_path_state)
     logger.debug("Saved model to disk")
 
-    #best_index = np.argmax(cv_roc_auc_scores)
-    #best_drug_model = cv_models[int(best_index)]
-    ### Testing
-    test_i = 0
-    test_total_loss = 0
-    test_loss = []
-    test_roc_auc = 0
-    test_pr_auc = 0
-    test_preds = []
-    test_ys = []
-
-    with torch.set_grad_enabled(False):
-
-        best_crispr_model.eval()
-        for local_batch, local_labels in test_generator:
-            # Transfer to GPU
-            test_i += 1
-            local_labels_on_cpu = np.array(local_labels).reshape(-1)
-            test_ys.append(local_labels_on_cpu)
-            n_pos = sum(local_labels_on_cpu)
-            n_neg = len(local_labels_on_cpu) - sum(local_labels_on_cpu)
-            logger.debug("{0!r} positive samples and {1!r} negative samples".format(n_pos, n_neg))
-            local_batch, local_labels = local_batch.float().to(device2), local_labels.long().to(device2)
-            # Model computations
-            preds = best_crispr_model(local_batch)
-            assert preds.size(0) == local_labels.size(0)
-            nllloss_test = F.nll_loss(preds, local_labels).item()
-            prediction_on_cpu = preds.cpu().numpy()[:, 1]
-            test_preds.append(prediction_on_cpu)
-            test_total_loss += nllloss_test
-
-            n_iter = 1
-            if (test_i + 1) % n_iter == 0:
-                avg_loss = test_total_loss / n_iter
-                test_loss.append(avg_loss)
-                test_total_loss = 0
-
-        preds = np.concatenate(tuple(test_preds))
-        ys = np.concatenate(tuple(test_ys))
-        logger.debug("{0!r} test data was tested".format(len(ys)))
-        test_roc_auc = roc_auc_score(ys, preds)
-        test_pr_auc = average_precision_score(ys, preds)
-        save_output = []
-        if 'essentiality' in config.extra_numerical_features:
-            save_output.append(data_pre.crispr.loc[test_index, 'essentiality'])
-        save_output.append(pd.DataFrame(ys, columns=['ground_truth']))
-        save_output.append(pd.DataFrame(preds, columns=['prediction']))
-        save_output = pd.concat(save_output, ignore_index=True, axis=1)
-        save_output.to_csv(config.test_prediction, index=False)
-        logger.debug("Testing NLLloss is {0}, Testing roc_auc is {1!r} and Testing "
-                     "pr_auc is {2!r}".format(np.mean(test_loss), test_roc_auc, test_pr_auc))
-
+    save_output = []
+    if 'essentiality' in config.extra_numerical_features:
+        save_output.append(data_pre.crispr.loc[test_index, 'essentiality'])
+    test_model(best_crispr_model, test_generator, save_output)
 
 
     if config.check_feature_importance:
