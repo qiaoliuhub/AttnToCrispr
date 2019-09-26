@@ -39,32 +39,7 @@ logger = logging.getLogger("Recurrent neural network")
 logger.addHandler(fh)
 logger.setLevel(logging.DEBUG)
 
-def run():
-
-    data_pre = OT_crispr_attn.data_preparer()
-    print(data_pre.get_crispr_preview())
-    X = data_pre.prepare_x(mismatch=config.mismatch, trg_seq_col=config.trg_seq_col)
-    y = data_pre.get_labels()
-    data_pre.persist_data()
-    print(X.head())
-    print(data_pre.feature_length_map)
-    torch.manual_seed(0)
-    partition = {'test': list(X.index)}
-    labels = {key: value for key, value in zip(range(len(y)),
-                                               list(y.values.reshape(-1)))}
-    test_params = {'batch_size': config.batch_size,
-                   'shuffle': False}
-    logger.debug("Preparing datasets ... ")
-    test_set = my_data.MyDataset(partition['test'], labels)
-    test_generator = data.DataLoader(test_set, **test_params)
-    logger.debug("Building the scaled dot product attention model")
-
-    logger.debug("loading a trained model")
-    crispr_model = load(config.retraining_model)
-    crispr_model.load_state_dict(load(config.retraining_model_state))
-    crispr_model.to(device2)
-    logger.debug("loaded a trained model")
-
+def test_on_target_model(crispr_model, test_generator):
     ### Testing
     test_i = 0
     test_total_loss = 0
@@ -111,6 +86,38 @@ def run():
     logger.debug("Testing mse is {0}, Testing pearson correlation is {1!r} and Testing "
                  "spearman correlation is {2!r}".format(np.mean(test_loss), test_pearson, test_spearman))
 
+
+def run():
+
+    data_pre = OT_crispr_attn.data_preparer()
+    print(data_pre.get_crispr_preview())
+    X = data_pre.prepare_x(mismatch=config.mismatch, trg_seq_col=config.trg_seq_col)
+    y = data_pre.get_labels()
+    data_pre.persist_data()
+    print(X.head())
+    print(data_pre.feature_length_map)
+    torch.manual_seed(0)
+    partition = {'test': list(X.index)}
+    labels = {key: value for key, value in zip(range(len(y)),
+                                               list(y.values.reshape(-1)))}
+    test_params = {'batch_size': config.batch_size,
+                   'shuffle': False}
+    logger.debug("Preparing datasets ... ")
+    test_set = my_data.MyDataset(partition['test'], labels)
+    test_generator = data.DataLoader(test_set, **test_params)
+    logger.debug("Building the scaled dot product attention model")
+
+    logger.debug("loading a trained model")
+    crispr_model = load(config.retraining_model)
+    crispr_model.load_state_dict(load(config.retraining_model_state))
+    crispr_model.to(device2)
+    logger.debug("loaded a trained model")
+
+    if config.mismatch:
+        from flexible_OT_crispr import test_model
+        test_model(crispr_model, test_generator, [])
+    else:
+        test_on_target_model(crispr_model, test_generator)
 
 if __name__ == "__main__":
 
