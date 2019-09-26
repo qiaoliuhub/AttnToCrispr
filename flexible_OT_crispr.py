@@ -97,14 +97,15 @@ def test_model(best_crispr_model, test_generator, save_output):
     with torch.set_grad_enabled(False):
 
         best_crispr_model.eval()
+        n_pos = 0
+        n_neg = 0
         for local_batch, local_labels in test_generator:
             # Transfer to GPU
             test_i += 1
             local_labels_on_cpu = np.array(local_labels).reshape(-1)
             test_ys.append(local_labels_on_cpu)
-            n_pos = sum(local_labels_on_cpu)
-            n_neg = len(local_labels_on_cpu) - sum(local_labels_on_cpu)
-            logger.debug("{0!r} positive samples and {1!r} negative samples".format(n_pos, n_neg))
+            n_pos += sum(local_labels_on_cpu)
+            n_neg += (len(local_labels_on_cpu) - sum(local_labels_on_cpu))
             local_batch, local_labels = local_batch.float().to(device2), local_labels.long().to(device2)
             # Model computations
             preds = best_crispr_model(local_batch)
@@ -120,6 +121,7 @@ def test_model(best_crispr_model, test_generator, save_output):
                 test_loss.append(avg_loss)
                 test_total_loss = 0
 
+        logger.debug("{0!r} positive samples and {1!r} negative samples".format(n_pos, n_neg))
         preds = np.concatenate(tuple(test_preds))
         ys = np.concatenate(tuple(test_ys))
         logger.debug("{0!r} test data was tested".format(len(ys)))
