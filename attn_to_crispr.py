@@ -84,7 +84,7 @@ def run():
             local_labels_on_cpu = local_labels_on_cpu[:sample_size]
             local_batch, local_labels = local_batch.float().to(device2), local_labels.float().to(device2)
             preds = crispr_model(local_batch).contiguous().view(-1)
-            assert preds.size(-1) == local_labels.size(-1)
+            assert preds.size(0) == local_labels.size(0)
             prediction_on_cpu = preds.cpu().numpy().reshape(-1)
             mean_prediction_on_cpu = prediction_on_cpu[:sample_size]
             loss = mean_squared_error(local_labels_on_cpu, mean_prediction_on_cpu)

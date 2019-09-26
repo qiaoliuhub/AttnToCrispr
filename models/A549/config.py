@@ -21,6 +21,10 @@ seq_start = 0
 sep_len = 0
 seq_len = 22
 
+# data preparation parameters
+mismatch=False
+trg_seq_col=None
+
 # model types: concat, mul, mixed, ensemble
 model_type = "mixed"
 seq_cnn = True

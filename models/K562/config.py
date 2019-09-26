@@ -19,12 +19,16 @@ update_features = True
 # sequence length
 seq_start = 0
 sep_len = 0
-seq_len = 20
+seq_len = 22
 
 # model types: concat, mul, mixed, ensemble
 model_type = "mixed"
 seq_cnn = True
 ensemble = (model_type == "ensemble")
+
+# data preparation parameters
+mismatch=False
+trg_seq_col=None
 
 # epochs
 n_epochs = 200
@@ -155,7 +159,7 @@ run_specific_attention_setting = os.path.join(run_dir, "attention_setting.py")
 cur_dir_attention_setting = os.path.join(retraining_model_path, "attention_setting.py")
 
 # save run specific data
-retransform = False
+retransform = True
 run_specific_data_after_transform = os.path.join(data_dir, "after_transform_data_K562")
 run_specific_data_after_transform_rev = os.path.join(data_dir, "after_transform_data_cpfrev")
 run_specific_data_after_transform_cnn = os.path.join(data_dir, "after_transform_data_cpfcnn")
