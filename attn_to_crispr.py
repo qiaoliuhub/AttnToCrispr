@@ -43,7 +43,7 @@ def run():
 
     data_pre = OT_crispr_attn.data_preparer()
     print(data_pre.get_crispr_preview())
-    X = data_pre.prepare_x()
+    X = data_pre.prepare_x(mismatch=True, trg_seq_col='Target sequence')
     y = data_pre.get_labels()
     data_pre.persist_data()
     print(X.head())
