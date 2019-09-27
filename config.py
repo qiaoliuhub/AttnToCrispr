@@ -26,6 +26,10 @@ model_type = "ensemble"
 seq_cnn = True
 ensemble = (model_type == "ensemble")
 
+# data preparation parameters
+mismatch=False
+trg_seq_col=None
+
 # epochs
 n_epochs = 5
 patience = 100
