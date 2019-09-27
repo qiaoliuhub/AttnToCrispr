@@ -38,16 +38,8 @@ This model includes four components:
 * numpy
 
 # Usage
-## Specify which model to use
+## Specify which data or model to use, such as cpf1 and cpf1_OT.
 
-change the model directory in config.py when old model need to be loaded for testing
 ```
-loaded_model_path = os.path.join(cur_dir, "dataset/best_model/<cellline>_attn_model.h5")
-```
-
-## Run the program and get prediction result
-
-Make sure the data is in dataset/\<cellline\>/ folder and execute
-```
-python ./attn_to_crispr.py dataset/<cellline>
+python ./attn_to_crispr.py <cellline>
 ```
