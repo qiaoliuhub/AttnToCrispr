@@ -1,0 +1,29 @@
+import os
+import sys
+import importlib
+
+# Setting the correct config file
+config_path = ".".join(["models", sys.argv[1]]) + "." if len(sys.argv) >= 2 else ""
+config = importlib.import_module(config_path + "config")
+
+output_FF_layers = [100, 2] #[4000, 1000, 100, 1] #[200, 200, 100, 100, 1]
+cur_work_dir = os.getcwd()
+d_model = 8
+attention_heads = 4
+attention_dropout = 0.0
+n_layers = 1
+add_seq_cnn = False
+add_parallel_cnn = False
+k_dim = 10
+cnn_dropout = 0.2
+attention_norm = False
+attention_layer_norm = False
+n_feature_dim = config.embedding_vec_dim
+analysis = 'deepCrispr'
+oversample = True
+#(should always be 1)
+
+data_folder = os.path.join(cur_work_dir, 'datas_deepCrispr_cen')
+if not os.path.exists(data_folder):
+    print("Create {0} directory".format(data_folder))
+    os.mkdir(data_folder)
