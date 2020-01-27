@@ -45,4 +45,4 @@ This model includes four components:
 ```
 python ./attn_to_crispr.py <data/model>
 ```
-<data/model> could be K562/A549/NB4/cpf1
+<data/model> could be K562/A549/NB4/cpf1/cpf1_OT/deepCrispr_OT
