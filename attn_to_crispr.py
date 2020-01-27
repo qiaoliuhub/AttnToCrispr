@@ -108,8 +108,8 @@ def run():
     logger.debug("Building the scaled dot product attention model")
 
     logger.debug("loading a trained model")
-    crispr_model = load(config.retraining_model)
-    crispr_model.load_state_dict(load(config.retraining_model_state))
+    crispr_model = load(config.retraining_model, map_location=device2)
+    crispr_model.load_state_dict(load(config.retraining_model_state, map_location=device2))
     crispr_model.to(device2)
     logger.debug("loaded a trained model")
 
