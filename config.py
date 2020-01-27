@@ -108,7 +108,7 @@ check_feature_importance = True
 ml_train = False
 
 # Whether or not to train the model again
-training = True
+training = False
 old_model_hdf5_path = os.path.join(cur_dir, "dataset/K562/run_K562__CN_centrality_reg_ens1904240007")
 old_model_hdf5 = os.path.join(old_model_hdf5_path, "lstm_model.h5")
 

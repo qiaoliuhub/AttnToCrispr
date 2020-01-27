@@ -1,15 +1,10 @@
+import config
 import os
-import sys
-import importlib
 
-# Setting the correct config file
-config_path = ".".join(["models", sys.argv[1]]) + "." if len(sys.argv) >= 2 else ""
-config = importlib.import_module(config_path + "config")
-
-output_FF_layers = [50, 1] #[4000, 1000, 100, 1] #[200, 200, 100, 100, 1]
+output_FF_layers = [100, 1] #[4000, 1000, 100, 1] #[200, 200, 100, 100, 1]
 cur_work_dir = os.getcwd()
 d_model = 64
-attention_heads = 16
+attention_heads = 32
 attention_dropout = 0.0
 n_layers = 1
 k_dim = 10
