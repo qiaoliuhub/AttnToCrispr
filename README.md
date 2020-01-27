@@ -37,6 +37,7 @@ This model includes four components:
 * pandas
 * numpy
 * skorch
+* visdom
 
 # Usage
 ## Specify which data or model to use, such as cpf1 and cpf1_OT.
