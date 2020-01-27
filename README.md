@@ -36,10 +36,12 @@ This model includes four components:
 * sklearn
 * pandas
 * numpy
+* skorch
 
 # Usage
 ## Specify which data or model to use, such as cpf1 and cpf1_OT.
 
 ```
-python ./attn_to_crispr.py <cellline>
+python ./attn_to_crispr.py <data/model>
 ```
+<data/model> could be K562/A549/NB4/cpf1
