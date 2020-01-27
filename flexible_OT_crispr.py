@@ -131,7 +131,7 @@ def test_model(best_crispr_model, test_generator, save_output):
         save_output.append(pd.DataFrame(preds, columns=['prediction']))
         save_output = pd.concat(save_output, ignore_index=True, axis=1)
         save_output.to_csv(config.test_prediction, index=False)
-        logger.debug("Testing NLLloss is {0}, Testing roc_auc is {1!r} and Testing "
+        logger.debug("Testing roc_auc is {1!r} and Testing "
                      "pr_auc is {2!r}".format(np.mean(test_loss), test_roc_auc, test_pr_auc))
 
 def run():
