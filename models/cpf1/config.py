@@ -13,7 +13,7 @@ else:
     cellline = "test"
 
 # data speficic name, for example, if file name is K562_CN, then data_specific is _CN
-data_specific = "_CN_centrality" if cellline != "test" else ""
+data_specific = "_data" if cellline != "test" else ""
 update_features = False
 
 # sequence length
@@ -25,6 +25,10 @@ seq_len = 34
 model_type = "mixed"
 seq_cnn = True
 ensemble = (model_type == "ensemble")
+
+# data preparation parameters
+mismatch=False
+trg_seq_col=None
 
 # epochs
 n_epochs = 200
@@ -88,7 +92,7 @@ off_target = False
 rev_seq = False
 
 # output
-y = ['log2fc'] # ["Normalized efficacy"] #'log2fc'
+y = ['Indel_frequency'] # ["Normalized efficacy"] #'log2fc'
 y_transform = False
 y_inverse_transform = False
 log2fc_filter = False
@@ -113,7 +117,7 @@ fine_tune_trainable = True
 retraining_datasize = 3.0/3 if retraining else 1
 frozen_embedding_only = True
 fullly_connected_train_fraction = 1.0/1
-retraining_model_path = os.path.join(cur_dir, "dataset/K562/run_K562__CN_centrality_reg_mix1810280000")
+retraining_model_path = os.path.join(cur_dir, "models", cellline)
 retraining_model = os.path.join(retraining_model_path, "attn_model.h5")
 retraining_model_state = os.path.join(retraining_model_path, "attn_model_state.h5")
 retraining_dataset = ""
@@ -150,9 +154,9 @@ if retraining:
 #
 # else use the existed config file
 run_specific_config = os.path.join(run_dir, "config.py")
-cur_dir_config = os.path.join(cur_dir, "config.py")
+cur_dir_config = os.path.join(retraining_model_path, "config.py")
 run_specific_attention_setting = os.path.join(run_dir, "attention_setting.py")
-cur_dir_attention_setting = os.path.join(cur_dir, "attention_setting.py")
+cur_dir_attention_setting = os.path.join(retraining_model_path, "attention_setting.py")
 
 # save run specific data
 retransform = False
