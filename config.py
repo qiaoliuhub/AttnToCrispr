@@ -14,7 +14,7 @@ else:
 
 # data speficic name, for example, if file name is K562_CN, then data_specific is _CN
 data_specific = "_CN_centrality" if cellline != "test" else ""
-update_features = False
+update_features = True
 
 # sequence length
 seq_start = 0
@@ -27,8 +27,8 @@ seq_cnn = True
 ensemble = (model_type == "ensemble")
 
 # data preparation parameters
-mismatch=False
-trg_seq_col=None
+mismatch=True
+trg_seq_col='Target sequence'
 
 # epochs
 n_epochs = 5

@@ -250,7 +250,7 @@ def run():
 
                     train_total_loss += loss.item()
 
-                    n_iter = 2
+                    n_iter = 50
                     if i % n_iter == 0:
                         sample_size = len(train_index)
                         p = int(100 * i * config.batch_size / sample_size)
