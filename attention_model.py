@@ -155,7 +155,8 @@ class OTembeddingTransformer(nn.Module):
                                   src_mask=src_mask, trg_mask=trg_mask)
         if self.classifier:
             # output = F.log_softmax(output, dim = -1)
-            output = F.softmax(output, dim = -1)
+            #output = F.softmax(output, dim = -1)
+            pass
         return output
 
 

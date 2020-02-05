@@ -110,7 +110,9 @@ def test_model(best_crispr_model, test_generator, save_output):
             # Model computations
             preds = best_crispr_model(local_batch)
             assert preds.size(0) == local_labels.size(0)
-            nllloss_test = F.nll_loss(preds, local_labels).item()
+            criterion = torch.nn.CrossEntropyLoss()
+            nllloss_test = criterion(preds, local_labels).item()
+            # nllloss_test = F.nll_loss(preds, local_labels).item()
             prediction_on_cpu = preds.cpu().numpy()[:, 1]
             test_preds.append(prediction_on_cpu)
             test_total_loss += nllloss_test
@@ -244,7 +246,9 @@ def run():
                     ys = local_labels.contiguous().view(-1)
                     optimizer.zero_grad()
                     assert preds.size(0) == ys.size(0)
-                    loss = F.nll_loss(preds, ys)
+                    #loss = F.nll_loss(preds, ys)
+                    criterion = torch.nn.CrossEntropyLoss()
+                    loss = criterion(preds, ys)
                     loss.backward()
                     optimizer.step()
 
@@ -284,7 +288,9 @@ def run():
                         local_batch, local_labels = local_batch.float().to(device2), local_labels.long().to(device2)
                         preds = crispr_model(local_batch)
                         assert preds.size(0) == local_labels.size(0)
-                        nllloss_val = F.nll_loss(preds, local_labels).item()
+                        criterion = torch.nn.CrossEntropyLoss()
+                        nllloss_val = criterion(preds, local_labels).item()
+                        # nllloss_val = F.nll_loss(preds, local_labels).item()
                         train_val_total_loss += nllloss_val
                         prediction_on_cpu = preds.cpu().numpy()[:,1]
                         train_val_preds.append(prediction_on_cpu)
@@ -327,7 +333,9 @@ def run():
                         local_batch, local_labels = local_batch.float().to(device2), local_labels.long().to(device2)
                         preds = crispr_model(local_batch)
                         assert preds.size(0) == local_labels.size(0)
-                        nllloss_val = F.nll_loss(preds, local_labels).item()
+                        criterion = torch.nn.CrossEntropyLoss()
+                        nllloss_val = criterion(preds, local_labels).item()
+                        #nllloss_val = F.nll_loss(preds, local_labels).item()
                         prediction_on_cpu = preds.cpu().numpy()[:,1]
                         val_preds.append(prediction_on_cpu)
                         val_total_loss += nllloss_val

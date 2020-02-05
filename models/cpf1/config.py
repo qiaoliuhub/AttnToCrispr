@@ -39,7 +39,7 @@ min_lr = 0.0001
 # model hyperparameters
 start_lr = 0.00007
 dropout = 0.5
-batch_size = 100
+batch_size = 10
 lr_decay = 0.001
 maxnorm = 100
 augment_data = False

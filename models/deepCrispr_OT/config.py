@@ -14,7 +14,7 @@ else:
 
 # data speficic name, for example, if file name is K562_CN, then data_specific is _CN
 data_specific = "_data" if cellline != "test" else ""
-update_features = True
+update_features = False
 
 # sequence length
 seq_start = 0
