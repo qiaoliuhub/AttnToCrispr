@@ -59,7 +59,7 @@ test_cellline = None
 add_norm = False
 
 # split method, it could be leave_gene, stratified, leave_off_target_sgRNA, leave_group_sgRNA or regular
-split_method = "stratified"
+split_method = "regular"
 # could be "regular", "group"
 test_method = "regular"
 # categorize gene symbols or None for split or test use
