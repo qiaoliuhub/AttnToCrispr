@@ -38,6 +38,7 @@ This model includes four components:
 * numpy
 * skorch
 * visdom
+* shap
 
 # Usage
 ## Specify which data or model to use, such as cpf1 and cpf1_OT.
