@@ -29,7 +29,11 @@ This model includes four components:
 * Fully connected layer
 
 # Requirement
-
+1. if conda is used, the virtual environment can be created with:
+```
+conda env create -f environment.yml
+```
+2. required packages
 * keras
 * tensorflow
 * pytorch
