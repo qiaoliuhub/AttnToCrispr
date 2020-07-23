@@ -22,7 +22,7 @@ from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier,
 import pdb
 
 ### setting pytorch working environment
-os.environ['CUDA_VISIBLE_DEVICES'] = "6"
+os.environ['CUDA_VISIBLE_DEVICES'] = "0"
 use_cuda = cuda.is_available()
 if use_cuda:
     device2 = device("cuda:0")
