@@ -23,7 +23,7 @@ import OT_crispr_attn
 import feature_imp
 
 # setting nvidia gpu environment
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "6"
 # CUDA for PyTorch
 use_cuda = cuda.is_available()
 if use_cuda:
