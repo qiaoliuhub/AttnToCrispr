@@ -31,7 +31,7 @@ seq_cnn = True
 ensemble = (model_type == "ensemble")
 
 # epochs
-n_epochs = 200
+n_epochs = 50
 patience = 100
 decay_steps = 1000
 min_lr = 0.0001

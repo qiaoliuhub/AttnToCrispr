@@ -125,7 +125,6 @@ class data_preparer:
             self.__feature_length_map.append(None)
 
         self.X = X_src
-        pdb.set_trace()
         return X_src
 
     def persist_data(self):

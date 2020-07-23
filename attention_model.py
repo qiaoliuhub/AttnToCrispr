@@ -75,7 +75,6 @@ class Transformer(nn.Module):
         e_outputs = self.encoder(src, src_mask)
         # print("DECODER")
         d_output = self.decoder(trg, e_outputs, src_mask, trg_mask)
-        pdb.set_trace()
         if attention_setting.add_seq_cnn:
             if extra_input_for_FF is not None and attention_setting.analysis == 'deepCrispr':
                 bs = extra_input_for_FF.size(0)
@@ -83,7 +82,6 @@ class Transformer(nn.Module):
                 d_output = cat((d_output, extra_input_for_FF), dim = 2)
             d_output = torch.unsqueeze(d_output, 1)
             d_output = self.cnn(d_output)
-        pdb.set_trace()
         flat_d_output = d_output.view(-1, d_output.size(-2)*d_output.size(-1))
         if attention_setting.add_parallel_cnn:
             src = torch.unsqueeze(src, 1)
@@ -211,7 +209,6 @@ def get_OT_model(feature_len_map, classifier = False):
 
     assert attention_setting.d_model % attention_setting.attention_heads == 0
     assert attention_setting.attention_dropout < 1
-    pdb.set_trace()
     if not classifier:
         model = OTembeddingTransformer(attention_setting.n_feature_dim, attention_setting.d_model,
                                    attention_setting.n_layers, attention_setting.attention_heads,
