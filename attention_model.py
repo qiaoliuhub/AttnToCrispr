@@ -12,7 +12,7 @@ import math
 import OT_crispr_attn
 import sys
 import importlib
-
+import pdb
 # Setting the correct config file
 config_path = ".".join(["models", sys.argv[1]]) + "." if len(sys.argv) >= 2 else ""
 config = importlib.import_module(config_path + "config")
@@ -59,13 +59,13 @@ class Transformer(nn.Module):
         self.cnn = customized_CNN()
         assert not attention_setting.add_seq_cnn or not attention_setting.add_parallel_cnn
         if attention_setting.add_seq_cnn:
-            d_input = 64 * (((d_input + 1) // 2 + 1) // 2)
+            d_input = 64 * (((d_input + 2) // 2 + 2) // 2)
             if attention_setting.analysis == 'deepCrispr':
                 d_model += 4
                 extra_length = 0
         if attention_setting.add_parallel_cnn:
             d_input_1 = d_input * d_model
-            d_input_2 = ((64 * (((d_input + 1) // 2 + 1) // 2)) * config.embedding_vec_dim)
+            d_input_2 = ((64 * (((d_input + 2) // 2 + 2) // 2)) * config.embedding_vec_dim)
             d_input = d_input_1 + d_input_2
             d_model = 1
         self.out = OutputFeedForward(d_model, d_input, extra_length, d_layers=attention_setting.output_FF_layers, dropout=dropout)
@@ -75,6 +75,7 @@ class Transformer(nn.Module):
         e_outputs = self.encoder(src, src_mask)
         # print("DECODER")
         d_output = self.decoder(trg, e_outputs, src_mask, trg_mask)
+        pdb.set_trace()
         if attention_setting.add_seq_cnn:
             if extra_input_for_FF is not None and attention_setting.analysis == 'deepCrispr':
                 bs = extra_input_for_FF.size(0)
@@ -82,6 +83,7 @@ class Transformer(nn.Module):
                 d_output = cat((d_output, extra_input_for_FF), dim = 2)
             d_output = torch.unsqueeze(d_output, 1)
             d_output = self.cnn(d_output)
+        pdb.set_trace()
         flat_d_output = d_output.view(-1, d_output.size(-2)*d_output.size(-1))
         if attention_setting.add_parallel_cnn:
             src = torch.unsqueeze(src, 1)
@@ -100,7 +102,10 @@ class customized_CNN(nn.Module):
         self.cnn_1 = nn.Conv2d(1, 32, kernel_size=(3,1), padding=(1,0))
         self.maxpool_1 = nn.MaxPool2d(kernel_size=(2,1), padding=(1,0))
         self.cnn_2 = nn.Conv2d(32, 64, kernel_size=(3,1), padding=(1,0))
-        self.maxpool_2 = nn.MaxPool2d(kernel_size=(2,1))
+        if config.seq_len == 22:
+            self.maxpool_2 = nn.MaxPool2d(kernel_size=(2,1), padding=(1,0))
+        else:
+            self.maxpool_2 = nn.MaxPool2d(kernel_size=(2,1), padding=(1,0))
         self.dropout = nn.Dropout(p = attention_setting.cnn_dropout)
 
     def forward(self, input):
@@ -206,6 +211,7 @@ def get_OT_model(feature_len_map, classifier = False):
 
     assert attention_setting.d_model % attention_setting.attention_heads == 0
     assert attention_setting.attention_dropout < 1
+    pdb.set_trace()
     if not classifier:
         model = OTembeddingTransformer(attention_setting.n_feature_dim, attention_setting.d_model,
                                    attention_setting.n_layers, attention_setting.attention_heads,
